@@ -21,7 +21,7 @@ class _FullScreenPlayerState extends State<FullScreenPlayer> {
   @override
   void initState() {
     super.initState();
-    controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
+    controller = VideoPlayerController.asset(widget.videoUrl)
       ..setVolume(0)
       ..setLooping(true)
       ..play();
@@ -35,8 +35,18 @@ class _FullScreenPlayerState extends State<FullScreenPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(future: controller.initialize(), builder: (context, snapshot){
-      return const Center(child: CircularProgressIndicator(strokeWidth: 2),);
-    });
+    return FutureBuilder(
+      future: controller.initialize(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+        }
+
+        return AspectRatio(
+          aspectRatio: controller.value.aspectRatio,
+          child: VideoPlayer(controller),
+        );
+      },
+    );
   }
 }
